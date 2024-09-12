@@ -1,1 +1,1 @@
-web: voila --port=$PORT --no-browser --strip_sources=True your_notebook.ipynb
+web: voila --port=$PORT --no-browser --strip_sources=True NFL_game_analysis.ipynb
