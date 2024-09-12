@@ -1,0 +1,1 @@
+web: voila --port=$PORT --no-browser --strip_sources=True your_notebook.ipynb
