@@ -3,3 +3,5 @@ pandas
 matplotlib
 seaborn
 ipywidgets
+nfl_data_py
+warnings
