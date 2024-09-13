@@ -85,6 +85,10 @@ def season_dashboard():
 
 # Plot creation for the game dashboard
 def create_game_plot(week, season, team, stats):
+	
+    if not stats:
+        return "Please select at least one statistic."	
+	
     week_df = nfl_main_df[(nfl_main_df["week"] == week) & (nfl_main_df["season"] == season)]
     if week_df.empty:
         return "No data for the selected filters."
@@ -132,6 +136,9 @@ def create_game_plot(week, season, team, stats):
 
 # Plot creation for the season dashboard
 def create_season_plot(season, stats):
+
+    if not stats:
+        return "Please select at least one statistic."
     season_df = nfl_main_df[nfl_main_df["season"] == season].groupby(["player_display_name", "team"])[stats].sum().reset_index()
     if season_df.empty:
         return "No data for the selected filters."
