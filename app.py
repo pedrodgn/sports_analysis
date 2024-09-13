@@ -44,7 +44,6 @@ def game_dashboard():
        'receptions', 'targets', 'receiving_yards', 'receiving_tds',
        'receiving_fumbles', 'receiving_fumbles_lost', 'receiving_air_yards',
        'receiving_yards_after_catch', 'receiving_first_downs'
-        # Add more stats if needed
     ]
 
     if request.method == 'POST':
@@ -63,7 +62,6 @@ def game_dashboard():
 def season_dashboard():
     seasons = list(nfl_main_df["season"].sort_values().unique())
     stats_options = [
-        'completions', 'passing_tds', 'receptions', 'receiving_tds'
         'completions', 'attempts',
        'passing_yards', 'passing_tds', 'interceptions', 'sacks', 'sack_yards',
        'sack_fumbles', 'sack_fumbles_lost', 'passing_air_yards',
