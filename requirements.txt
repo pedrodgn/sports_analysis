@@ -1,7 +1,5 @@
 numpy
 pandas
-matplotlib
-seaborn
 ipywidgets
-voila
 plotly
+Flask
