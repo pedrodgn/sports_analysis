@@ -4,45 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
-    <h1>Game Dashboard</h1>
-    <form method="POST">
-        <label for="week">Week:</label>
-        <select name="week">
-            {% for week in weeks %}
-                <option value="{{ week }}">{{ week }}</option>
-            {% endfor %}
-        </select>
+    <div class="container mt-5">
+        <h1>Game Dashboard</h1>
+        <form method="POST" class="mt-4">
+            <div class="mb-3">
+                <label for="week" class="form-label">Week</label>
+                <select id="week" name="week" class="form-control">
+                    {% for week in weeks %}
+                        <option value="{{ week }}">{{ week }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="season" class="form-label">Season</label>
+                <select id="season" name="season" class="form-control">
+                    {% for season in seasons %}
+                        <option value="{{ season }}">{{ season }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="team" class="form-label">Team</label>
+                <select id="team" name="team" class="form-control">
+                    {% for team in teams %}
+                        <option value="{{ team }}">{{ team }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="stats" class="form-label">Select Stats</label>
+                <select id="stats" name="stats" class="form-control select2" multiple="multiple" style="width: 100%;">
+                    {% for stat in stats_options %}
+                        <option value="{{ stat }}">{{ stat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" id="clear-stats" class="btn btn-danger">Clear Selections</button>
+        </form>
 
-        <label for="season">Season:</label>
-        <select name="season">
-            {% for season in seasons %}
-                <option value="{{ season }}">{{ season }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="team">Team:</label>
-        <select name="team">
-            {% for team in teams %}
-                <option value="{{ team }}">{{ team }}</option>
-            {% endfor %}
-        </select>
-
-        <label for="stats">Stats:</label>
-        <select name="stats" multiple>
-            {% for stat in stats_options %}
-                <option value="{{ stat }}">{{ stat }}</option>
-            {% endfor %}
-        </select>
-
-        <input type="submit" value="Generate Plot">
-    </form>
-
-    <div>
-        {% if plot %}
-            {{ plot|safe }}
-        {% endif %}
+        <div class="mt-5">
+            {% if plot %}
+                {{ plot | safe }}
+            {% endif %}
+        </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: "Select statistics",
+                allowClear: true
+            });
+
+            $('#clear-stats').click(function() {
+                $('.select2').val(null).trigger('change');
+            });
+        });
+    </script>
 </body>
 </html>
