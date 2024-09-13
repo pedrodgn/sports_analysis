@@ -34,7 +34,16 @@ def game_dashboard():
     seasons = list(nfl_main_df["season"].sort_values().unique())
     teams = list(nfl_main_df["team"].sort_values().unique())
     stats_options = [
-        'completions', 'passing_tds', 'receptions', 'receiving_tds'
+        'completions', 'attempts',
+       'passing_yards', 'passing_tds', 'interceptions', 'sacks', 'sack_yards',
+       'sack_fumbles', 'sack_fumbles_lost', 'passing_air_yards',
+       'passing_yards_after_catch', 'passing_first_downs', 'passing_epa',
+       'passing_2pt_conversions', 'pacr', 'dakota', 'carries', 'rushing_yards',
+       'rushing_tds', 'rushing_fumbles', 'rushing_fumbles_lost',
+       'rushing_first_downs', 'rushing_epa', 'rushing_2pt_conversions',
+       'receptions', 'targets', 'receiving_yards', 'receiving_tds',
+       'receiving_fumbles', 'receiving_fumbles_lost', 'receiving_air_yards',
+       'receiving_yards_after_catch', 'receiving_first_downs'
         # Add more stats if needed
     ]
 
@@ -55,7 +64,16 @@ def season_dashboard():
     seasons = list(nfl_main_df["season"].sort_values().unique())
     stats_options = [
         'completions', 'passing_tds', 'receptions', 'receiving_tds'
-        # Add more stats if needed
+        'completions', 'attempts',
+       'passing_yards', 'passing_tds', 'interceptions', 'sacks', 'sack_yards',
+       'sack_fumbles', 'sack_fumbles_lost', 'passing_air_yards',
+       'passing_yards_after_catch', 'passing_first_downs', 'passing_epa',
+       'passing_2pt_conversions', 'pacr', 'dakota', 'carries', 'rushing_yards',
+       'rushing_tds', 'rushing_fumbles', 'rushing_fumbles_lost',
+       'rushing_first_downs', 'rushing_epa', 'rushing_2pt_conversions',
+       'receptions', 'targets', 'receiving_yards', 'receiving_tds',
+       'receiving_fumbles', 'receiving_fumbles_lost', 'receiving_air_yards',
+       'receiving_yards_after_catch', 'receiving_first_downs'
     ]
 
     if request.method == 'POST':
@@ -77,7 +95,7 @@ def create_game_plot(week, season, team, stats):
     game_df = nfl_main_df[nfl_main_df["game_id"] == game_id]
 
     num_stats = len(stats)
-    ncols = 2
+    ncols = 3
     nrows = int(np.ceil(num_stats / ncols))
 
     fig = sp.make_subplots(rows=nrows, cols=ncols, subplot_titles=stats)
@@ -87,11 +105,13 @@ def create_game_plot(week, season, team, stats):
         if not filtered_data.empty:
             colors = [team_colors.get(t, 'grey') for t in filtered_data['team']]
             trace = go.Bar(
-                x=filtered_data["player_display_name"],
-                y=filtered_data[s],
-                marker=dict(color=colors),
-                hoverinfo="text+y"
-            )
+                        x=filtered_data["player_display_name"],
+                        y=filtered_data[s],
+                        name=s,
+                        marker=dict(color=colors),  # Apply team color
+                        text=filtered_data["team"],
+                        hoverinfo="text+y"
+                    )
             row = i // ncols + 1
             col = i % ncols + 1
             fig.add_trace(trace, row=row, col=col)
@@ -110,7 +130,7 @@ def create_season_plot(season, stats):
         return "No data for the selected filters."
 
     num_stats = len(stats)
-    ncols = 2
+    ncols = 3
     nrows = int(np.ceil(num_stats / ncols))
 
     fig = sp.make_subplots(rows=nrows, cols=ncols, subplot_titles=stats)
@@ -120,18 +140,20 @@ def create_season_plot(season, stats):
         if not filtered_data.empty:
             colors = [team_colors.get(t, 'grey') for t in filtered_data['team']]
             trace = go.Bar(
-                x=filtered_data["player_display_name"],
-                y=filtered_data[s],
-                marker=dict(color=colors),
-                hoverinfo="text+y"
-            )
+                        x=filtered_data["player_display_name"],
+                        y=filtered_data[s],
+                        name=s,
+                        marker=dict(color=colors),  # Apply team color
+                        text=filtered_data["team"],
+                        hoverinfo="text+y"
+                    )
             row = i // ncols + 1
             col = i % ncols + 1
             fig.add_trace(trace, row=row, col=col)
         else:
             row = i // ncols + 1
             col = i % ncols + 1
-            fig.add_annotation(x=0.5, y=0.5, text="No Data", showarrow=False, xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
+            fig.add_annotation(x=0.8, y=0.8, text="No Data", showarrow=False, xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
 
     fig.update_layout(height=400 * nrows, width=800)
     return fig.to_html(full_html=False)
