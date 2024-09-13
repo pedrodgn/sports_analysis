@@ -1,1 +1,1 @@
-web: voila --port=$PORT --no-browser --strip_sources=True NFL_game_analysis.ipynb
+web: python -m voila --port=${PORT:-5000} --no-browser --strip_sources=True NFL_game_analysis.ipynb
