@@ -88,7 +88,7 @@ def create_game_plot(week, season, team, stats):
     week_df = nfl_main_df[(nfl_main_df["week"] == week) & (nfl_main_df["season"] == season)]
     if week_df.empty:
         return "No data for the selected filters."
-    
+
     game_id = week_df[week_df["team"] == team]["game_id"].values[0]
     game_df = nfl_main_df[nfl_main_df["game_id"] == game_id]
 
@@ -106,7 +106,7 @@ def create_game_plot(week, season, team, stats):
                         x=filtered_data["player_display_name"],
                         y=filtered_data[s],
                         name=s,
-                        marker=dict(color=colors),  # Apply team color
+                        marker=dict(color=colors),
                         text=filtered_data["team"],
                         hoverinfo="text+y"
                     )
@@ -118,7 +118,16 @@ def create_game_plot(week, season, team, stats):
             col = i % ncols + 1
             fig.add_annotation(x=0.5, y=0.5, text="No Data", showarrow=False, xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
 
-    fig.update_layout(height=400 * nrows, width=800)
+    fig.update_layout(
+        height=400 * nrows, 
+        width=1000,  # Increased width to accommodate larger subplots
+        title_text=f"Game Dashboard for {team} in Week {week} - {season}"
+    )
+
+    # Update x-axis properties
+    for i in range(num_stats):
+        fig.update_xaxes(tickangle=70, row=(i // ncols) + 1, col=(i % ncols) + 1)
+
     return fig.to_html(full_html=False)
 
 # Plot creation for the season dashboard
@@ -141,7 +150,7 @@ def create_season_plot(season, stats):
                         x=filtered_data["player_display_name"],
                         y=filtered_data[s],
                         name=s,
-                        marker=dict(color=colors),  # Apply team color
+                        marker=dict(color=colors),
                         text=filtered_data["team"],
                         hoverinfo="text+y"
                     )
@@ -151,9 +160,18 @@ def create_season_plot(season, stats):
         else:
             row = i // ncols + 1
             col = i % ncols + 1
-            fig.add_annotation(x=0.8, y=0.8, text="No Data", showarrow=False, xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
+            fig.add_annotation(x=0.5, y=0.5, text="No Data", showarrow=False, xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
 
-    fig.update_layout(height=400 * nrows, width=800)
+    fig.update_layout(
+        height=400 * nrows,
+        width=1000,  # Increased width to accommodate larger subplots
+        title_text=f"Season Dashboard for {season}"
+    )
+
+    # Update x-axis properties
+    for i in range(num_stats):
+        fig.update_xaxes(tickangle=70, row=(i // ncols) + 1, col=(i % ncols) + 1)
+
     return fig.to_html(full_html=False)
 
 if __name__ == '__main__':
