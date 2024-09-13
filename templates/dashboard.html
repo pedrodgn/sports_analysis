@@ -4,14 +4,45 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game Dashboard</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
     <h1>Game Dashboard</h1>
-    <div id="plot"></div>
-    <script>
-        var data = {{ plot_data | safe }};
-        Plotly.newPlot('plot', data);
-    </script>
+    <form method="POST">
+        <label for="week">Week:</label>
+        <select name="week">
+            {% for week in weeks %}
+                <option value="{{ week }}">{{ week }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="season">Season:</label>
+        <select name="season">
+            {% for season in seasons %}
+                <option value="{{ season }}">{{ season }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="team">Team:</label>
+        <select name="team">
+            {% for team in teams %}
+                <option value="{{ team }}">{{ team }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="stats">Stats:</label>
+        <select name="stats" multiple>
+            {% for stat in stats_options %}
+                <option value="{{ stat }}">{{ stat }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="submit" value="Generate Plot">
+    </form>
+
+    <div>
+        {% if plot %}
+            {{ plot|safe }}
+        {% endif %}
+    </div>
 </body>
 </html>
