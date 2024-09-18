@@ -100,7 +100,7 @@ def create_game_plot(week, season, team, stats):
     ncols = 3
     nrows = int(np.ceil(num_stats / ncols))
 
-    fig = sp.make_subplots(rows=nrows, cols=ncols, subplot_titles=stats)
+    fig = sp.make_subplots(rows=nrows, cols=ncols, subplot_titles=stats, horizontal_spacing=0.15, vertical_spacing=0.25)
 
     for i, s in enumerate(stats):
         filtered_data = game_df[game_df[s] > 0].sort_values(s, ascending=False)
@@ -123,8 +123,8 @@ def create_game_plot(week, season, team, stats):
             fig.add_annotation(x=0.5, y=0.5, text="No Data", showarrow=False, xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
 
     fig.update_layout(
-        height=400 * nrows, 
-        width=1000,  # Increased width to accommodate larger subplots
+        height=420 * nrows, 
+        width=1250,  # Increased width to accommodate larger subplots
         title_text=f"Game Dashboard for {team} in Week {week} - {season}"
     )
 
@@ -147,7 +147,7 @@ def create_season_plot(season, stats):
     ncols = 3
     nrows = int(np.ceil(num_stats / ncols))
 
-    fig = sp.make_subplots(rows=nrows, cols=ncols, subplot_titles=stats, horizontal_spacing=0.15, vertical_spacing=0.2)
+    fig = sp.make_subplots(rows=nrows, cols=ncols, subplot_titles=stats, horizontal_spacing=0.15, vertical_spacing=0.25)
 
     for i, s in enumerate(stats):
         filtered_data = season_df[season_df[s] > 0].sort_values(s, ascending=False)[:10]
@@ -171,7 +171,7 @@ def create_season_plot(season, stats):
 
     fig.update_layout(
         height=420 * nrows,
-        width=1200,  # Increased width to accommodate larger subplots
+        width=1250,  # Increased width to accommodate larger subplots
         title_text=f"Season Dashboard for {season}"
     )
 
