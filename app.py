@@ -125,7 +125,7 @@ def create_game_plot(week, season, team, stats):
     fig.update_layout(
         height=450 * nrows, 
         width=1500,  # Increased width to accommodate larger subplots
-        title_text=f"Game Dashboard for {team} in Week {week} - {season}"
+        title_text=f"Game Dashboard for {team} in Week {week} - {season}", showlegend=False
     )
 
     # Update x-axis properties
@@ -172,7 +172,7 @@ def create_season_plot(season, stats):
     fig.update_layout(
         height=450 * nrows,
         width=1500,  # Increased width to accommodate larger subplots
-        title_text=f"Season Dashboard for {season}"
+        title_text=f"Season Dashboard for {season}", showlegend=False
     )
 
     # Update x-axis properties
