@@ -123,8 +123,8 @@ def create_game_plot(week, season, team, stats):
             fig.add_annotation(x=0.5, y=0.5, text="No Data", showarrow=False, xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
 
     fig.update_layout(
-        height=420 * nrows, 
-        width=1250,  # Increased width to accommodate larger subplots
+        height=450 * nrows, 
+        width=1500,  # Increased width to accommodate larger subplots
         title_text=f"Game Dashboard for {team} in Week {week} - {season}"
     )
 
