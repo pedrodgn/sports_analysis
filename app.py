@@ -210,7 +210,7 @@ def create_season_plot(season, stats):
     return fig.to_html(full_html=False)
 
 # Plot creation for the player comparison
-def create_player_comparison_plot(season, player1, player2, stats):
+def create_qb_comparison_plot(season, player1, player2, stats):
     if not stats:
         return "Please select at least one statistic."
 
