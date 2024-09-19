@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QB Comparison Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>QB Comparison Dashboard</h1>
+        <p>This dashboard allows you to compare two quarterbacks' season statistics side by side. Select the season, quarterbacks, and stats to analyze their performance.</p>
+        <p><strong>Instructions:</strong></p>
+        <ul>
+            <li>Select the season you want to analyze.</li>
+            <li>Select two quarterbacks for comparison.</li>
+            <li>Select one or more statistics to view the comparison.</li>
+            <li>Click 'Submit' to view the visualizations.</li>
+            <li>You can clear all statistics selections by clicking 'Clear Selections'.</li>
+        </ul>
+        <form method="POST" class="mt-4">
+            <div class="mb-3">
+                <label for="season" class="form-label">Season</label>
+                <select id="season" name="season" class="form-control">
+                    {% for season in seasons %}
+                        <option value="{{ season }}">{{ season }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="qb1" class="form-label">Select QB 1</label>
+                <select id="qb1" name="qb1" class="form-control select2" style="width: 100%;">
+                    {% for qb in qbs %}
+                        <option value="{{ qb }}">{{ qb }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="qb2" class="form-label">Select QB 2</label>
+                <select id="qb2" name="qb2" class="form-control select2" style="width: 100%;">
+                    {% for qb in qbs %}
+                        <option value="{{ qb }}">{{ qb }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label for="stats" class="form-label">Select Stats</label>
+                <select id="stats" name="stats" class="form-control select2" multiple="multiple" style="width: 100%;">
+                    {% for stat in stats_options %}
+                        <option value="{{ stat }}">{{ stat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" id="clear-stats" class="btn btn-danger">Clear Selections</button>
+        </form>
+
+        <div class="mt-5">
+            {% if plot %}
+                {{ plot | safe }}
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                placeholder: "Select statistics or quarterbacks",
+                allowClear: true
+            });
+
+            $('#clear-stats').click(function() {
+                $('.select2').val(null).trigger('change');
+            });
+        });
+    </script>
+</body>
+</html>

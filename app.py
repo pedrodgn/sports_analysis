@@ -83,6 +83,34 @@ def season_dashboard():
 
     return render_template('season_dashboard.html', seasons=seasons, stats_options=stats_options)
 
+# Player Comparison Route
+@app.route('/qb-comparison-dashboard', methods=['GET', 'POST'])
+def qb_comparison_dashboard():
+    # Filter QBs from the dataset
+    qb_df = nfl_main_df[nfl_main_df["position"] == "QB"]
+    
+    seasons = list(qb_df["season"].sort_values().unique())
+    qbs = list(qb_df["player_display_name"].unique())  # List of QB names
+    stats_options = [
+        'completions', 'attempts', 'passing_yards', 'passing_tds', 
+        'interceptions', 'sacks', 'passing_air_yards', 
+        'passing_yards_after_catch', 'passing_first_downs', 
+        'passing_epa', 'passing_2pt_conversions'
+    ]
+
+    if request.method == 'POST':
+        # Get form input
+        season = int(request.form['season'])
+        qb1 = request.form['qb1']
+        qb2 = request.form['qb2']
+        stats = request.form.getlist('stats')
+
+        # Generate the plot based on user input
+        return render_template('qb_comparison_dashboard.html', plot=create_qb_comparison_plot(season, qb1, qb2, stats), seasons=seasons, qbs=qbs, stats_options=stats_options)
+
+    return render_template('qb_comparison_dashboard.html', seasons=seasons, qbs=qbs, stats_options=stats_options)
+
+
 # Plot creation for the game dashboard
 def create_game_plot(week, season, team, stats):
 	
@@ -178,6 +206,69 @@ def create_season_plot(season, stats):
     # Update x-axis properties
     for i in range(num_stats):
         fig.update_xaxes(tickangle=70, row=(i // ncols) + 1, col=(i % ncols) + 1)
+
+    return fig.to_html(full_html=False)
+
+# Plot creation for the player comparison
+def create_player_comparison_plot(season, player1, player2, stats):
+    if not stats:
+        return "Please select at least one statistic."
+
+    # Filter data for the given season and the two players
+    season_df = nfl_main_df[(nfl_main_df["season"] == season) & nfl_main_df["player_display_name"].isin([player1, player2])]
+
+    if season_df.empty:
+        return f"No data for players {player1} and {player2} in season {season}."
+
+    # Group the data by player to get season stats
+    player_df = season_df.groupby(["player_display_name", "team"])[stats].sum().reset_index()
+
+    # Set up subplots: 1 row for each stat, 2 columns for the 2 players
+    num_stats = len(stats)
+    fig = sp.make_subplots(rows=num_stats, cols=2, 
+                           subplot_titles=[f"{player1} - {stat}" for stat in stats] + [f"{player2} - {stat}" for stat in stats], 
+                           horizontal_spacing=0.15, vertical_spacing=0.2)
+
+    for i, s in enumerate(stats):
+        # Get data for player 1
+        player1_data = player_df[player_df["player_display_name"] == player1]
+        if not player1_data.empty:
+            trace1 = go.Bar(
+                x=[player1],
+                y=player1_data[s],
+                name=player1,
+                marker=dict(color=team_colors.get(player1_data["team"].values[0], 'grey')),
+                text=player1_data["team"],
+                hoverinfo="text+y"
+            )
+            fig.add_trace(trace1, row=i + 1, col=1)
+        else:
+            fig.add_annotation(x=0.5, y=0.5, text="No Data", showarrow=False, 
+                               xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
+
+        # Get data for player 2
+        player2_data = player_df[player_df["player_display_name"] == player2]
+        if not player2_data.empty:
+            trace2 = go.Bar(
+                x=[player2],
+                y=player2_data[s],
+                name=player2,
+                marker=dict(color=team_colors.get(player2_data["team"].values[0], 'grey')),
+                text=player2_data["team"],
+                hoverinfo="text+y"
+            )
+            fig.add_trace(trace2, row=i + 1, col=2)
+        else:
+            fig.add_annotation(x=0.5, y=0.5, text="No Data", showarrow=False, 
+                               xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
+
+    # Update layout for better readability
+    fig.update_layout(
+        height=450 * num_stats,
+        width=1450,  # Increased width for comparison
+        title_text=f"Player Comparison: {player1} vs {player2} - Season {season}",
+        showlegend=False
+    )
 
     return fig.to_html(full_html=False)
 
