@@ -223,49 +223,56 @@ def create_qb_comparison_plot(season, player1, player2, stats):
     # Group the data by player to get season stats
     player_df = season_df.groupby(["player_display_name", "team"])[stats].sum().reset_index()
 
-    # Set up subplots: 1 row for each stat, 2 columns for the 2 players
+    # Set up subplots: create a grid with 3 plots per row
     num_stats = len(stats)
-    fig = sp.make_subplots(rows=num_stats, cols=2, 
-                           subplot_titles=[f"{player1} - {stat}" for stat in stats] + [f"{player2} - {stat}" for stat in stats], 
-                           horizontal_spacing=0.15, vertical_spacing=0.2)
+    ncols = 3
+    nrows = int(np.ceil(num_stats / ncols))
+
+    fig = sp.make_subplots(
+        rows=nrows, cols=ncols,
+        subplot_titles=[f"{stat} Comparison: {player1} vs {player2}" for stat in stats],
+        horizontal_spacing=0.15, vertical_spacing=0.2
+    )
 
     for i, s in enumerate(stats):
         # Get data for player 1
         player1_data = player_df[player_df["player_display_name"] == player1]
+        player2_data = player_df[player_df["player_display_name"] == player2]
+
+        row = i // ncols + 1
+        col = i % ncols + 1
+
         if not player1_data.empty:
             trace1 = go.Bar(
                 x=[player1],
                 y=player1_data[s],
-                name=player1,
+                name=f"{player1} - {s}",
                 marker=dict(color=team_colors.get(player1_data["team"].values[0], 'grey')),
                 text=player1_data["team"],
                 hoverinfo="text+y"
             )
-            fig.add_trace(trace1, row=i + 1, col=1)
-        else:
-            fig.add_annotation(x=0.5, y=0.5, text="No Data", showarrow=False, 
-                               xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
+            fig.add_trace(trace1, row=row, col=col)
 
-        # Get data for player 2
-        player2_data = player_df[player_df["player_display_name"] == player2]
         if not player2_data.empty:
             trace2 = go.Bar(
                 x=[player2],
                 y=player2_data[s],
-                name=player2,
+                name=f"{player2} - {s}",
                 marker=dict(color=team_colors.get(player2_data["team"].values[0], 'grey')),
                 text=player2_data["team"],
                 hoverinfo="text+y"
             )
-            fig.add_trace(trace2, row=i + 1, col=2)
-        else:
+            fig.add_trace(trace2, row=row, col=col)
+
+        # Handle the case where there is no data
+        if player1_data.empty and player2_data.empty:
             fig.add_annotation(x=0.5, y=0.5, text="No Data", showarrow=False, 
                                xref=f"x{i+1}", yref=f"y{i+1}", font=dict(color="red"))
 
     # Update layout for better readability
     fig.update_layout(
-        height=450 * num_stats,
-        width=1450,  # Increased width for comparison
+        height=450 * nrows,
+        width=1450,
         title_text=f"Player Comparison: {player1} vs {player2} - Season {season}",
         showlegend=False
     )
