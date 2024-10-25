@@ -21,11 +21,66 @@ team_colors = {
     'NYJ': 'rgb(18, 87, 64)', 'PHI': 'rgb(0, 76, 84)', 'PIT': 'rgb(0, 0, 0)', 'SEA': 'rgb(0, 21, 50)',
     'SF': 'rgb(170, 0, 0)', 'TB': 'rgb(213, 10, 10)', 'TEN': 'rgb(68, 149, 209)', 'WAS': 'rgb(63, 16, 16)'
 }
+model = joblib.load('best_xgboost_model.pkl')
+pitcher_df_reduced = pd.read_csv("pitcher_reduced.csv")
+batter_df_reduced = pd.read_csv("batter_df_reduced.csv")
+at_bat_result_dict = {0: 'single',1: 'double_triple',
+    2: 'home_run',3: 'walk',
+    4: 'field_out',5: 'strikeout'}
+features = ['balls', 'strikes', 'on_3b', 'on_2b', 'on_1b', 'outs_when_up',
+            'batter_walk_rate', 'batter_strikeout_rate',
+            'batter_singles_average',
+                                    'batter_home_run_average',
+           'pitcher_walk_rate', 'pitcher_strikeout_percentage',
+       'pitcher_batting_average_against', 'pitcher_home_run_average']
 
 # Homepage
 @app.route('/')
 def home():
     return render_template('index.html')
+
+# MLB Matchup Route
+@app.route('/mlb-matchup', methods=['GET', 'POST'])
+def mlb_matchup():
+    batters = list(batter_df_reduced["batter_name"].sort_values().unique())
+    pitchers = list(pitcher_df_reduced["pitcher_name"].sort_values().unique())
+    balls_options = [0, 1, 2, 3]
+    strikes_options = [0, 1, 2]
+    base_options = [0, 1]  # 0 = no runner, 1 = runner present
+    outs_options = [0, 1, 2]
+
+    if request.method == 'POST':
+        batter_name = request.form['batter_name']
+        pitcher_name = request.form['pitcher_name']
+        balls = int(request.form['balls'])
+        strikes = int(request.form['strikes'])
+        on_3b = int(request.form['on_3b'])
+        on_2b = int(request.form['on_2b'])
+        on_1b = int(request.form['on_1b'])
+        outs_when_up = int(request.form['outs_when_up'])
+
+        # Generate radar plots and probability plot based on user input
+        proba_plot, batter_plot, pitcher_plot = plot_probabilities(
+            batter_name, pitcher_name, balls, strikes, on_3b, on_2b, on_1b, outs_when_up
+        )
+
+        return render_template(
+            'mlb_matchup.html',
+            batter_plot=batter_plot,
+            pitcher_plot=pitcher_plot,
+            proba_plot=proba_plot,
+            batters=batters, pitchers=pitchers, balls_options=balls_options,
+            strikes_options=strikes_options, base_options=base_options,
+            outs_options=outs_options
+        )
+
+    return render_template(
+        'mlb_matchup.html',
+        batters=batters, pitchers=pitchers, balls_options=balls_options,
+        strikes_options=strikes_options, base_options=base_options,
+        outs_options=outs_options
+    )
+
 
 # Game Dashboard Route
 @app.route('/game-dashboard', methods=['GET', 'POST'])
@@ -278,6 +333,130 @@ def create_qb_comparison_plot(season, player1, player2, stats):
     )
 
     return fig.to_html(full_html=False)
+
+
+def plot_probabilities(batter_name, pitcher_name, balls, strikes, on_3b, on_2b, on_1b, outs_when_up):
+    # Filter dataframe based on selected batter and pitcher
+    batter_filtered_df = batter_df_reduced[(batter_df_reduced['batter_name'] == batter_name)][[
+        'batter_batting_average', 'batter_on_base_percentage', 'batter_slugging_percent', 
+        'batter_walk_rate', 'batter_strikeout_rate','batter_singles_average', 'batter_home_run_average']].reset_index(drop=True)
+    
+    pitcher_filtered_df = pitcher_df_reduced[(pitcher_df_reduced['pitcher_name'] == pitcher_name)][[
+        'pitcher_walk_rate', 'pitcher_era', 'pitcher_strikeout_percentage', 
+        'pitcher_batting_average_against','pitcher_home_run_average']].reset_index(drop=True)
+    
+    
+    # Get max values for each stat column from the dataframe (for normalization)
+    batter_max_values = {
+        'batter_batting_average': batter_df_reduced['batter_batting_average'].max(),
+        'batter_on_base_percentage': batter_df_reduced['batter_on_base_percentage'].max(),
+        'batter_slugging_percent': batter_df_reduced['batter_slugging_percent'].max(),
+        'batter_walk_rate': batter_df_reduced['batter_walk_rate'].max(),
+        'batter_strikeout_rate': batter_df_reduced['batter_strikeout_rate'].max()
+    }
+
+    pitcher_max_values = {
+        'pitcher_walk_rate': pitcher_df_reduced['pitcher_walk_rate'].max(),
+        'pitcher_era': pitcher_df_reduced['pitcher_era'].max(),
+        'pitcher_strikeout_percentage': pitcher_df_reduced['pitcher_strikeout_percentage'].max(),
+        'pitcher_batting_average_against': pitcher_df_reduced['pitcher_batting_average_against'].max()
+    }
+    
+    # Combine batter and pitcher data
+    filtered_df = pd.concat([batter_filtered_df, pitcher_filtered_df], axis=1)
+    filtered_df['balls'] = balls
+    filtered_df['strikes'] = strikes
+    filtered_df['on_3b'] = on_3b
+    filtered_df['on_2b'] = on_2b
+    filtered_df['on_1b'] = on_1b
+    filtered_df['outs_when_up'] = outs_when_up
+
+    # Prepare the input for the model
+    filtered_df = filtered_df[features]
+    predict_proba_list = model.predict_proba(filtered_df)
+
+    # Get class labels
+    outcomes = list(at_bat_result_dict.values())
+    
+    # Prepare data for visualization
+    proba_df = pd.DataFrame({
+        'at_bat_result': outcomes,
+        'probability': predict_proba_list[0]  # Assuming the first row
+    })
+    proba_df['probability'] = proba_df['probability'].apply(lambda x: round(x*100, 2))
+
+    # Create probability bar chart
+    prob_plot = px.bar(proba_df, x='at_bat_result', y='probability',
+                       title=f"Probabilities of At-Bat Outcomes for {batter_name} vs {pitcher_name}",
+                       labels={'at_bat_result': 'At-Bat Result', 'probability': 'Probability'})
+
+    ### Radar plot for batter stats ###
+    batter_stats = batter_filtered_df.iloc[0].values
+    batter_stats_normalized = [
+        batter_stats[0] / batter_max_values['batter_batting_average'],
+        batter_stats[1] / batter_max_values['batter_on_base_percentage'],
+        batter_stats[2] / batter_max_values['batter_slugging_percent'],
+        batter_stats[3] / batter_max_values['batter_walk_rate'],
+        (batter_max_values['batter_strikeout_rate']-batter_stats[4]) / batter_max_values['batter_strikeout_rate']
+    ]
+    batter_categories = ['Batting Avg', 'OBP', 'Slugging %', 'Walk Rate', 'Strikeout Rate']
+    
+    batter_plot = go.Figure()
+    batter_plot.add_trace(go.Scatterpolar(
+        r=batter_stats_normalized, 
+        theta=batter_categories, 
+        fill='toself', 
+        name='Batter Stats',
+        hovertemplate = (
+            f'Batting Avg: {batter_stats[0]:.3f}<br>' +
+            f'OBP: {batter_stats[1]:.3f}<br>' +
+            f'Slugging %: {batter_stats[2]:.3f}<br>' +
+            f'Walk Rate: {batter_stats[3]*100:.2f}%<br>' +
+            f'Strikeout Rate: {batter_stats[4]*100:.2f}%<br>'
+        )
+    ))
+
+    batter_plot.update_layout(
+        polar=dict(radialaxis=dict(visible=False, range=[0, 1])),
+        title=f"{batter_name} - Batter Stats Radar",
+        showlegend=False
+    )
+
+    ### Radar plot for pitcher stats ###
+    pitcher_stats = pitcher_filtered_df.iloc[0].values
+    pitcher_stats_normalized = [
+        (pitcher_max_values['pitcher_walk_rate']-pitcher_stats[0]) / pitcher_max_values['pitcher_walk_rate'],
+        (5 - pitcher_stats[1]) / 5,  # Inverse for ERA (since lower is better)
+        pitcher_stats[2] / pitcher_max_values['pitcher_strikeout_percentage'],
+        (pitcher_max_values['pitcher_batting_average_against']-pitcher_stats[3]) / pitcher_max_values['pitcher_batting_average_against']
+    ]
+    pitcher_categories = ['Walk Rate', 'ERA', 'Strikeout %', 'BA Against']
+
+    pitcher_plot = go.Figure()
+    pitcher_plot.add_trace(go.Scatterpolar(
+        r=pitcher_stats_normalized, 
+        theta=pitcher_categories, 
+        fill='toself', 
+        name='Pitcher Stats',
+        hovertemplate = (
+            f'Walk Rate: {pitcher_stats[0]*100:.2f}%<br>' +
+            f'ERA: {pitcher_stats[1]:.2f}<br>' +
+            f'Strikeout %: {pitcher_stats[2]*100:.2f}%<br>' +
+            f'BA Against: {pitcher_stats[3]:.3f}<br>'
+        )
+    ))
+
+    pitcher_plot.update_layout(
+        polar=dict(radialaxis=dict(visible=False, range=[0, 1])),
+        title=f"{pitcher_name} - Pitcher Stats Radar",
+        showlegend=False
+    )
+    
+    prob_plot = prob_plot.to_html(full_html=False)
+    batter_plot = batter_plot.to_html(full_html=False)
+    pitcher_plot = pitcher_plot.to_html(full_html=False)
+    
+    return prob_plot, batter_plot, pitcher_plot
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLB Matchup Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>MLB Matchup Dashboard</h1>
+
+        <!-- Instructions below the title -->
+        <p>
+            Select the batter, pitcher, and relevant game situation to generate the visualizations. The probability plot displays outcome probabilities for the current matchup, while the two radar charts show season statistics for the selected players.
+        </p>
+
+        <form method="POST" class="mt-4">
+
+            <!-- First row: Batter and Pitcher -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="batter_name" class="form-label">Batter Name</label>
+                    <select id="batter_name" name="batter_name" class="form-control select2">
+                        {% for batter in batters %}
+                            <option value="{{ batter }}">{{ batter }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="pitcher_name" class="form-label">Pitcher Name</label>
+                    <select id="pitcher_name" name="pitcher_name" class="form-control select2">
+                        {% for pitcher in pitchers %}
+                            <option value="{{ pitcher }}">{{ pitcher }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Second row: Balls and Strikes -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="balls" class="form-label">Balls</label>
+                    <select id="balls" name="balls" class="form-control select2">
+                        <option value="0">0</option>
+                        {% for ball in balls_options %}
+                            <option value="{{ ball }}">{{ ball }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="strikes" class="form-label">Strikes</label>
+                    <select id="strikes" name="strikes" class="form-control select2">
+                        <option value="0">0</option>
+                        {% for strike in strikes_options %}
+                            <option value="{{ strike }}">{{ strike }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Third row: On base and outs -->
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="on_1b" class="form-label">On 1B</label>
+                    <select id="on_1b" name="on_1b" class="form-control select2">
+                        <option value="0">0</option>
+                        {% for base in base_options %}
+                            <option value="{{ base }}">{{ base }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="on_2b" class="form-label">On 2B</label>
+                    <select id="on_2b" name="on_2b" class="form-control select2">
+                        <option value="0">0</option>
+                        {% for base in base_options %}
+                            <option value="{{ base }}">{{ base }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="on_3b" class="form-label">On 3B</label>
+                    <select id="on_3b" name="on_3b" class="form-control select2">
+                        <option value="0">0</option>
+                        {% for base in base_options %}
+                            <option value="{{ base }}">{{ base }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Outs Dropdown -->
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="outs_when_up" class="form-label">Number of Outs</label>
+                    <select id="outs_when_up" name="outs_when_up" class="form-control select2">
+                        <option value="0">0</option>
+                        {% for out in outs_options %}
+                            <option value="{{ out }}">{{ out }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+
+        <!-- Probability Bar Chart -->
+        <div class="mt-5">
+            <h3>At-Bat Outcome Probabilities</h3>
+            <div id="proba_plot">
+                {{ proba_plot|safe }}
+            </div>
+        </div>
+
+        <!-- Side by side batter and pitcher radar plots -->
+        <div class="row mt-5">
+            <div class="col-md-6">
+                <h3>Batter Stats Radar Chart</h3>
+                <div id="batter_plot">
+                    {{ batter_plot|safe }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3>Pitcher Stats Radar Chart</h3>
+                <div id="pitcher_plot">
+                    {{ pitcher_plot|safe }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2();
+        });
+    </script>
+</body>
+</html>
