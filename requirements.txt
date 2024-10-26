@@ -4,3 +4,4 @@ ipywidgets
 plotly
 Flask
 joblib
+xgboost

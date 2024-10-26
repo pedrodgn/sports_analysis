@@ -5,6 +5,7 @@ import plotly.subplots as sp
 import os
 import numpy as np
 import joblib
+from xgboost import XGBClassifier
 
 app = Flask(__name__)
 
