@@ -23,9 +23,16 @@ team_colors = {
     'NYJ': 'rgb(18, 87, 64)', 'PHI': 'rgb(0, 76, 84)', 'PIT': 'rgb(0, 0, 0)', 'SEA': 'rgb(0, 21, 50)',
     'SF': 'rgb(170, 0, 0)', 'TB': 'rgb(213, 10, 10)', 'TEN': 'rgb(68, 149, 209)', 'WAS': 'rgb(63, 16, 16)'
 }
-model = joblib.load('best_xgboost_model.pkl')
-pitcher_df_reduced = pd.read_csv("pitcher_reduced.csv")
-batter_df_reduced = pd.read_csv("batter_df_reduced.csv")
+
+model_path = os.path.join(os.getcwd(), 'best_xgboost_model.pkl')
+model = joblib.load(model_path)
+
+csv_path = os.path.join(os.getcwd(), 'pitcher_reduced.csv')
+pitcher_df_reduced = pd.read_csv(csv_path)
+
+csv_path = os.path.join(os.getcwd(), 'batter_reduced.csv')
+batter_df_reduced = pd.read_csv(csv_path)
+
 at_bat_result_dict = {0: 'single',1: 'double_triple',
     2: 'home_run',3: 'walk',
     4: 'field_out',5: 'strikeout'}
