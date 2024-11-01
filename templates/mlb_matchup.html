@@ -22,8 +22,8 @@
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="batter_name" class="form-label">Batter Name</label>
-                    <select id="batter_name" name="batter_name" class="form-control select2" style="width: 100%;" data-placeholder="Search for Batter">
-                        <option></option> <!-- Placeholder option for select2 -->
+                    <select id="batter_name" name="batter_name" class="form-control select2" style="width: 100%;">
+                        <option value="">Select Batter</option>
                         {% for batter in batters %}
                             <option value="{{ batter }}">{{ batter }}</option>
                         {% endfor %}
@@ -31,8 +31,8 @@
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="pitcher_name" class="form-label">Pitcher Name</label>
-                    <select id="pitcher_name" name="pitcher_name" class="form-control select2" style="width: 100%;" data-placeholder="Search for Pitcher">
-                        <option></option> <!-- Placeholder option for select2 -->
+                    <select id="pitcher_name" name="pitcher_name" class="form-control select2" style="width: 100%;">
+                        <option value="">Select Pitcher</option>
                         {% for pitcher in pitchers %}
                             <option value="{{ pitcher }}">{{ pitcher }}</option>
                         {% endfor %}
@@ -45,7 +45,6 @@
                 <div class="col-md-6 mb-3">
                     <label for="balls" class="form-label">Balls</label>
                     <select id="balls" name="balls" class="form-control select2">
-                        <option value="0" selected>0</option>
                         {% for ball in balls_options %}
                             <option value="{{ ball }}">{{ ball }}</option>
                         {% endfor %}
@@ -54,7 +53,6 @@
                 <div class="col-md-6 mb-3">
                     <label for="strikes" class="form-label">Strikes</label>
                     <select id="strikes" name="strikes" class="form-control select2">
-                        <option value="0" selected>0</option>
                         {% for strike in strikes_options %}
                             <option value="{{ strike }}">{{ strike }}</option>
                         {% endfor %}
@@ -65,27 +63,24 @@
             <!-- Third row: On base and outs -->
             <div class="row">
                 <div class="col-md-4 mb-3">
-                    <label for="on_1b" class="form-label">On 1B</label>
+                    <label for="on_1b" class="form-label">Runner On 1B</label>
                     <select id="on_1b" name="on_1b" class="form-control select2">
-                        <option value="0" selected>0</option>
                         {% for base in base_options %}
                             <option value="{{ base }}">{{ base }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="on_2b" class="form-label">On 2B</label>
+                    <label for="on_2b" class="form-label">Runner On 2B</label>
                     <select id="on_2b" name="on_2b" class="form-control select2">
-                        <option value="0" selected>0</option>
                         {% for base in base_options %}
                             <option value="{{ base }}">{{ base }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="on_3b" class="form-label">On 3B</label>
+                    <label for="on_3b" class="form-label">Runner On 3B</label>
                     <select id="on_3b" name="on_3b" class="form-control select2">
-                        <option value="0" selected>0</option>
                         {% for base in base_options %}
                             <option value="{{ base }}">{{ base }}</option>
                         {% endfor %}
@@ -98,7 +93,6 @@
                 <div class="col-md-4 mb-3">
                     <label for="outs_when_up" class="form-label">Number of Outs</label>
                     <select id="outs_when_up" name="outs_when_up" class="form-control select2">
-                        <option value="0" selected>0</option>
                         {% for out in outs_options %}
                             <option value="{{ out }}">{{ out }}</option>
                         {% endfor %}
@@ -136,11 +130,15 @@
     </div>
 
     <!-- Load scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('.select2').select2();
+            $('.select2').select2({
+                placeholder: 'Type to search',
+                allowClear: true
+            });
         });
     </script>
 </body>
