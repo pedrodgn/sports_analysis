@@ -1,6 +1,6 @@
 # Sports Analysis
 
-Welcome to the **Sports Analysis** repository! This project is dedicated to creating dynamic, data-driven dashboards for analyzing various sports statistics. The first dashboard in this repository focuses on the NFL, with more dashboards for other sports coming soon.
+Welcome to the **Sports Analysis** repository! This project is dedicated to creating dynamic, data-driven dashboards for analyzing various sports statistics. The first dashboard in this repository focuses on the NFL, with more dashboards for other sports coming soon. Recently, we've added the **MLB Matchup Dashboard**, which leverages machine learning to predict outcomes based on player stats and matchup analysis.
 
 ## Features
 
@@ -10,16 +10,27 @@ Welcome to the **Sports Analysis** repository! This project is dedicated to crea
   - Custom multi-select dropdowns for stats selection.
   - Detailed visualizations using Plotly with adjustable layouts.
 
+- **MLB Matchup Dashboard**: Analyze matchups between batters and pitchers, focusing on key stats such as balls, strikes, base runners, and outs. The dashboard also utilizes machine learning to predict potential outcomes based on historical performance data.
+  - **Machine Learning Predictions**: Get predictions for possible at-bat outcomes (e.g., strikeout, walk, single, home run) based on current batter-pitcher matchups and historical stats.
+  - Select specific batters and pitchers.
+  - Filter by balls, strikes, bases occupied, and outs.
+  - Explore batter vs pitcher stats and performance trends.
+
 Future dashboards for other sports will be added to this repository.
 
 ## Access the Dashboards
 
-You can access the NFL dashboards online:
+You can access the dashboards online:
 
-- **Season Dashboard**: [https://nfl-dashboard-1d3ed0c1f8f1.herokuapp.com/season-dashboard](https://nfl-dashboard-1d3ed0c1f8f1.herokuapp.com/season-dashboard)
-- **Game Dashboard**: [https://nfl-dashboard-1d3ed0c1f8f1.herokuapp.com/game-dashboard](https://nfl-dashboard-1d3ed0c1f8f1.herokuapp.com/game-dashboard)
+- **MLB Matchup Dashboard**: [https://sports-analysis-fc35a386998b.herokuapp.com/mlb-matchup](https://sports-analysis-fc35a386998b.herokuapp.com/mlb-matchup)
+- **Season Dashboard**: [https://sports-analysis-fc35a386998b.herokuapp.com/season-dashboard](https://sports-analysis-fc35a386998b.herokuapp.com/season-dashboard)
+- **Game Dashboard**: [https://sports-analysis-fc35a386998b.herokuapp.com/game-dashboard](https://sports-analysis-fc35a386998b.herokuapp.com/game-dashboard)
 
 ## Usage
+
+- **MLB Matchup Dashboard**:
+  - **Home Page**: Navigate to the MLB Matchup Dashboard.
+  - **MLB Matchup Dashboard**: Select a batter, pitcher, and various filters like balls, strikes, and bases occupied to explore detailed matchup data, performance stats, and machine learning-based predictions for at-bat outcomes.
 
 - **NFL Dashboard**:
   - **Home Page**: Navigate to different dashboards from here.
@@ -35,3 +46,5 @@ We welcome contributions! If you have ideas for new sports dashboards or improve
 - Additional dashboards for NBA, MLB, and more.
 - Improved interactivity and advanced analytics features.
 - Integration with more datasets.
+
+
